@@ -1,3 +1,17 @@
+# Novel Solid
+
+This is a fork of [steven-tey/novel](https://github.com/steven-tey/novel) with the intention to port it to solid.js.
+
+```md
+Work in progress..
+```
+
+<br/>
+<br/>
+<br/>
+
+---
+
 <a href="https://novel.sh">
   <img alt="Novel is a Notion-style WYSIWYG editor with AI-powered autocompletions." src="https://novel.sh/opengraph-image.png">
   <h1 align="center">Novel</h1>
