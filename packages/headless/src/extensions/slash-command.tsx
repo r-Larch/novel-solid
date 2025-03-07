@@ -1,9 +1,12 @@
 import { Extension } from "@tiptap/core";
 import type { Editor, Range } from "@tiptap/core";
-import { ReactRenderer } from "@tiptap/react";
-import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
-import type { RefObject } from "react";
-import type { ReactNode } from "react";
+import Suggestion, {
+  type SuggestionKeyDownProps,
+  type SuggestionOptions,
+  type SuggestionProps,
+} from "@tiptap/suggestion";
+import { SolidRenderer } from "@tiptap/solid";
+import type { Accessor, ValidComponent } from "solid-js";
 import tippy, { type GetReferenceClientRect, type Instance, type Props } from "tippy.js";
 import { EditorCommandOut } from "../components/editor-command";
 
@@ -29,13 +32,16 @@ const Command = Extension.create({
   },
 });
 
-const renderItems = (elementRef?: RefObject<Element> | null) => {
-  let component: ReactRenderer | null = null;
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+function renderItems<I = any, TSelected = any>(
+  element?: Accessor<HTMLElement> | null,
+): ReturnType<NonNullable<SuggestionOptions<I, TSelected>["render"]>> {
+  let component: SolidRenderer<SuggestionProps<I, TSelected>> | null = null;
   let popup: Instance<Props>[] | null = null;
 
   return {
-    onStart: (props: { editor: Editor; clientRect: DOMRect }) => {
-      component = new ReactRenderer(EditorCommandOut, {
+    onStart: (props: SuggestionProps<I, TSelected>) => {
+      component = new SolidRenderer<SuggestionProps<I, TSelected>>(EditorCommandOut, {
         props,
         editor: props.editor,
       });
@@ -46,13 +52,12 @@ const renderItems = (elementRef?: RefObject<Element> | null) => {
       const blockType = parentNode.type.name;
 
       if (blockType === "codeBlock") {
-        return false;
+        return;
       }
 
-      // @ts-ignore
       popup = tippy("body", {
-        getReferenceClientRect: props.clientRect,
-        appendTo: () => (elementRef ? elementRef.current : document.body),
+        getReferenceClientRect: props.clientRect as GetReferenceClientRect,
+        appendTo: () => element?.() ?? document.body,
         content: component.element,
         showOnCreate: true,
         interactive: true,
@@ -60,23 +65,22 @@ const renderItems = (elementRef?: RefObject<Element> | null) => {
         placement: "bottom-start",
       });
     },
-    onUpdate: (props: { editor: Editor; clientRect: GetReferenceClientRect }) => {
+    onUpdate: (props: SuggestionProps<I, TSelected>) => {
       component?.updateProps(props);
 
       popup?.[0]?.setProps({
-        getReferenceClientRect: props.clientRect,
+        getReferenceClientRect: props.clientRect as GetReferenceClientRect,
       });
     },
 
-    onKeyDown: (props: { event: KeyboardEvent }) => {
+    onKeyDown: (props: SuggestionKeyDownProps) => {
       if (props.event.key === "Escape") {
         popup?.[0]?.hide();
 
         return true;
       }
 
-      // @ts-ignore
-      return component?.ref?.onKeyDown(props);
+      return component?.element?.dispatchEvent(props.event) ?? true;
     },
     onExit: () => {
       popup?.[0]?.destroy();
@@ -88,7 +92,7 @@ const renderItems = (elementRef?: RefObject<Element> | null) => {
 export interface SuggestionItem {
   title: string;
   description: string;
-  icon: ReactNode;
+  icon: ValidComponent;
   searchTerms?: string[];
   command?: (props: { editor: Editor; range: Range }) => void;
 }

@@ -12,8 +12,6 @@ import TiptapUnderline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
 import CustomKeymap from "./custom-keymap";
-import { ImageResizer } from "./image-resizer";
-import { Twitter } from "./twitter";
 import { Mathematics } from "./mathematics";
 import UpdatedImage from "./updated-image";
 
@@ -65,7 +63,6 @@ export * from "./slash-command";
 export {
   CodeBlockLowlight,
   Horizontal as HorizontalRule,
-  ImageResizer,
   InputRule,
   PlaceholderExtension as Placeholder,
   StarterKit,
@@ -81,7 +78,6 @@ export {
   TiptapLink,
   UpdatedImage,
   Youtube,
-  Twitter,
   Mathematics,
   CharacterCount,
   GlobalDragHandle,

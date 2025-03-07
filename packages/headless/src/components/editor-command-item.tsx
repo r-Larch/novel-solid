@@ -1,10 +1,8 @@
-import { forwardRef } from "react";
-import { CommandEmpty, CommandItem } from "cmdk";
-import { useCurrentEditor } from "@tiptap/react";
-import { useAtomValue } from "jotai";
-import { rangeAtom } from "../utils/atoms";
-import type { ComponentPropsWithoutRef } from "react";
+import { CommandEmpty, CommandItem } from "cmdk-solid";
+import { useCurrentEditor } from "@tiptap/solid";
+import { type ComponentProps, Show, splitProps } from "solid-js";
 import type { Editor, Range } from "@tiptap/core";
+import { useNovelStore } from "../utils/store";
 
 interface EditorCommandItemProps {
   readonly onCommand: ({
@@ -16,23 +14,20 @@ interface EditorCommandItemProps {
   }) => void;
 }
 
-export const EditorCommandItem = forwardRef<
-  HTMLDivElement,
-  EditorCommandItemProps & ComponentPropsWithoutRef<typeof CommandItem>
->(({ children, onCommand, ...rest }, ref) => {
-  const { editor } = useCurrentEditor();
-  const range = useAtomValue(rangeAtom);
+export const EditorCommandItem = (props: EditorCommandItemProps & ComponentProps<typeof CommandItem>) => {
+  const currentEditor = useCurrentEditor();
+  const [novel] = useNovelStore();
 
-  if (!editor || !range) return null;
+  const [_, rest] = splitProps(props, ["children", "onCommand"]);
 
   return (
-    <CommandItem ref={ref} {...rest} onSelect={() => onCommand({ editor, range })}>
-      {children}
-    </CommandItem>
+    <Show when={currentEditor() && novel.range}>
+      <CommandItem ref={props.ref} {...rest} onSelect={() => props.onCommand({ editor: currentEditor()!, range: novel.range! })}>
+        {props.children}
+      </CommandItem>
+    </Show>
   );
-});
-
-EditorCommandItem.displayName = "EditorCommandItem";
+};
 
 export const EditorCommandEmpty = CommandEmpty;
 

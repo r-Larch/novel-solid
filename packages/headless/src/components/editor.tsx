@@ -1,45 +1,39 @@
-import { EditorProvider } from "@tiptap/react";
-import type { EditorProviderProps, JSONContent } from "@tiptap/react";
-import { Provider } from "jotai";
-import { forwardRef, useRef } from "react";
-import type { FC, ReactNode } from "react";
-import tunnel from "tunnel-rat";
-import { novelStore } from "../utils/store";
-import { EditorCommandTunnelContext } from "./editor-command";
-
-export interface EditorProps {
-  readonly children: ReactNode;
-  readonly className?: string;
-}
+import type { JSONContent } from "@tiptap/core";
+import { EditorProvider, type EditorProviderProps } from "@tiptap/solid";
+import { type Component, type JSX, type Ref, splitProps } from "solid-js";
+import tunnel from "../utils/tunnel-rat";
+import { EditorCommandTunnelContext } from "../utils/tunnel-rat";
+import { NovelStoreProvider } from "../utils/store";
 
 interface EditorRootProps {
-  readonly children: ReactNode;
+  readonly children: JSX.Element;
 }
 
-export const EditorRoot: FC<EditorRootProps> = ({ children }) => {
-  const tunnelInstance = useRef(tunnel()).current;
-
+export const EditorRoot: Component<EditorRootProps> = (props) => {
+  const tunnelInstance = tunnel();
   return (
-    <Provider store={novelStore}>
-      <EditorCommandTunnelContext.Provider value={tunnelInstance}>{children}</EditorCommandTunnelContext.Provider>
-    </Provider>
+    <NovelStoreProvider>
+      <EditorCommandTunnelContext.Provider value={tunnelInstance}>
+        {props.children}
+      </EditorCommandTunnelContext.Provider>
+    </NovelStoreProvider>
   );
 };
 
 export type EditorContentProps = Omit<EditorProviderProps, "content"> & {
-  readonly children?: ReactNode;
-  readonly className?: string;
+  readonly ref?: Ref<HTMLDivElement>;
+  readonly children?: JSX.Element;
+  readonly class?: string;
   readonly initialContent?: JSONContent;
 };
 
-export const EditorContent = forwardRef<HTMLDivElement, EditorContentProps>(
-  ({ className, children, initialContent, ...rest }, ref) => (
-    <div ref={ref} className={className}>
-      <EditorProvider {...rest} content={initialContent}>
-        {children}
+export const EditorContent: Component<EditorContentProps> = (props) => {
+  const [_, rest] = splitProps(props, ["class", "children", "initialContent"]);
+  return (
+    <div ref={props.ref} class={props.class}>
+      <EditorProvider {...rest} content={props.initialContent}>
+        {props.children}
       </EditorProvider>
     </div>
-  ),
-);
-
-EditorContent.displayName = "EditorContent";
+  );
+};

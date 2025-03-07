@@ -1,0 +1,62 @@
+{
+  "name": "@tiptap/solid",
+  "description": "Solid components for tiptap",
+  "version": "2.11.5",
+  "homepage": "https://tiptap.dev",
+  "keywords": [
+    "tiptap",
+    "tiptap solid components"
+  ],
+  "license": "MIT",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/ueberdosis"
+  },
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "umd": "dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "dependencies": {
+    "@solid-primitives/refs": "^1.1.0",
+    "@tiptap/extension-bubble-menu": "^2.11.5",
+    "@tiptap/extension-floating-menu": "^2.11.5",
+    "@types/use-sync-external-store": "^0.0.6",
+    "fast-deep-equal": "^3",
+    "use-sync-external-store": "^1"
+  },
+  "devDependencies": {
+    "@tiptap/core": "^2.11.5",
+    "@tiptap/pm": "^2.11.5",
+    "tsconfig": "workspace:*",
+    "tsup": "^8.3.5",
+    "tsup-preset-solid": "^2.2.0"
+  },
+  "peerDependencies": {
+    "@tiptap/core": "^2.7.0",
+    "@tiptap/pm": "^2.7.0",
+    "solid-js": ">=1.9.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ueberdosis/tiptap",
+    "directory": "packages/solid"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "tsup"
+  },
+  "browser": {},
+  "typesVersions": {}
+}

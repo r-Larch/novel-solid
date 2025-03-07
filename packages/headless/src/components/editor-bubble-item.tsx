@@ -1,31 +1,23 @@
-import { forwardRef } from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { useCurrentEditor } from "@tiptap/react";
-import type { Editor } from "@tiptap/react";
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import { type Editor, useCurrentEditor } from "@tiptap/solid";
+import { type JSX, Show, splitProps } from "solid-js";
 
 interface EditorBubbleItemProps {
-  readonly children: ReactNode;
-  readonly asChild?: boolean;
+  readonly children: JSX.Element;
   readonly onSelect?: (editor: Editor) => void;
 }
 
-export const EditorBubbleItem = forwardRef<
-  HTMLDivElement,
-  EditorBubbleItemProps & Omit<ComponentPropsWithoutRef<"div">, "onSelect">
->(({ children, asChild, onSelect, ...rest }, ref) => {
-  const { editor } = useCurrentEditor();
-  const Comp = asChild ? Slot : "div";
+export const EditorBubbleItem = (props: EditorBubbleItemProps & Omit<JSX.IntrinsicElements["div"], "onSelect">) => {
+  const currentEditor = useCurrentEditor();
 
-  if (!editor) return null;
+  const [_, rest] = splitProps(props, ["children", "onSelect"]);
 
   return (
-    <Comp ref={ref} {...rest} onClick={() => onSelect?.(editor)}>
-      {children}
-    </Comp>
+    <Show when={currentEditor()}>
+      <div ref={props.ref} {...rest} onClick={() => props.onSelect?.(currentEditor()!)}>
+        {props.children}
+      </div>
+    </Show>
   );
-});
-
-EditorBubbleItem.displayName = "EditorBubbleItem";
+};
 
 export default EditorBubbleItem;

@@ -1,32 +1,25 @@
-import { useAtom, useSetAtom } from "jotai";
-import { useEffect, forwardRef, createContext } from "react";
-import { Command } from "cmdk";
-import { queryAtom, rangeAtom } from "../utils/atoms";
-import { novelStore } from "../utils/store";
-import type tunnel from "tunnel-rat";
-import type { ComponentPropsWithoutRef, FC } from "react";
 import type { Range } from "@tiptap/core";
-
-export const EditorCommandTunnelContext = createContext({} as ReturnType<typeof tunnel>);
+import { Command } from "cmdk-solid";
+import { type Component, type ComponentProps, createComputed, onCleanup, onMount, splitProps } from "solid-js";
+import { useNovelStore } from "../utils/store";
+import { EditorCommandTunnelContext } from "../utils/tunnel-rat";
 
 interface EditorCommandOutProps {
   readonly query: string;
   readonly range: Range;
 }
 
-export const EditorCommandOut: FC<EditorCommandOutProps> = ({ query, range }) => {
-  const setQuery = useSetAtom(queryAtom, { store: novelStore });
-  const setRange = useSetAtom(rangeAtom, { store: novelStore });
+export const EditorCommandOut: Component<EditorCommandOutProps> = (props) => {
+  const [novel, setNovel] = useNovelStore();
 
-  useEffect(() => {
-    setQuery(query);
-  }, [query, setQuery]);
+  createComputed(() => {
+    setNovel({
+      query: props.query,
+      range: props.range
+    });
+  });
 
-  useEffect(() => {
-    setRange(range);
-  }, [range, setRange]);
-
-  useEffect(() => {
+  onMount(() => {
     const navigationKeys = ["ArrowUp", "ArrowDown", "Enter"];
     const onKeyDown = (e: KeyboardEvent) => {
       if (navigationKeys.includes(e.key)) {
@@ -46,10 +39,10 @@ export const EditorCommandOut: FC<EditorCommandOutProps> = ({ query, range }) =>
       }
     };
     document.addEventListener("keydown", onKeyDown);
-    return () => {
+    onCleanup(() => {
       document.removeEventListener("keydown", onKeyDown);
-    };
-  }, []);
+    })
+  });
 
   return (
     <EditorCommandTunnelContext.Consumer>
@@ -58,32 +51,31 @@ export const EditorCommandOut: FC<EditorCommandOutProps> = ({ query, range }) =>
   );
 };
 
-export const EditorCommand = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<typeof Command>>(
-  ({ children, className, ...rest }, ref) => {
-    const [query, setQuery] = useAtom(queryAtom);
+export function EditorCommand(props: ComponentProps<typeof Command>) {
+  const [novel, setNovel] = useNovelStore();
 
-    return (
-      <EditorCommandTunnelContext.Consumer>
-        {(tunnelInstance) => (
-          <tunnelInstance.In>
-            <Command
-              ref={ref}
-              onKeyDown={(e) => {
-                e.stopPropagation();
-              }}
-              id="slash-command"
-              className={className}
-              {...rest}
-            >
-              <Command.Input value={query} onValueChange={setQuery} style={{ display: "none" }} />
-              {children}
-            </Command>
-          </tunnelInstance.In>
-        )}
-      </EditorCommandTunnelContext.Consumer>
-    );
-  },
-);
+  const [_, rest] = splitProps(props, ["children", "class"]);
+
+  return (
+    <EditorCommandTunnelContext.Consumer>
+      {(tunnelInstance) => (
+        <tunnelInstance.In>
+          <Command
+            ref={props.ref}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+            }}
+            id="slash-command"
+            class={props.class}
+            {...rest}
+          >
+            <Command.Input value={novel.query} onValueChange={query => setNovel({ query })} style={{ display: "none" }} />
+            {props.children}
+          </Command>
+        </tunnelInstance.In>
+      )}
+    </EditorCommandTunnelContext.Consumer>
+  );
+};
+
 export const EditorCommandList = Command.List;
-
-EditorCommand.displayName = "EditorCommand";

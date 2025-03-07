@@ -21,7 +21,6 @@ export {
   addAIHighlight,
   CodeBlockLowlight,
   HorizontalRule,
-  ImageResizer,
   InputRule,
   Placeholder,
   StarterKit,
@@ -37,7 +36,6 @@ export {
   TiptapLink,
   UpdatedImage,
   Youtube,
-  Twitter,
   Mathematics,
   CharacterCount,
   GlobalDragHandle,
@@ -66,5 +64,5 @@ export {
   getAllContent,
 } from "./utils";
 
-// Store and Atoms
-export { queryAtom, rangeAtom } from "./utils/atoms";
+// Store
+export { useNovelStore } from "./utils/store";
