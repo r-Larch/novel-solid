@@ -1,5 +1,5 @@
 import { CommandGroup, CommandItem, CommandSeparator } from "../ui/command";
-import { useEditor } from "novel";
+import { addAIHighlight, useEditor } from "novel";
 import { Check, TextQuote, TrashIcon } from "lucide-solid";
 
 type AICompletionCommandsProps = {
@@ -17,7 +17,6 @@ const AICompletionCommands = (props: AICompletionCommandsProps) => {
           value="replace"
           onSelect={() => {
             const selection = editor()!.view.state.selection;
-
             editor()!
               .chain()
               .focus()
@@ -27,6 +26,7 @@ const AICompletionCommands = (props: AICompletionCommandsProps) => {
                   to: selection.to,
                 },
                 props.completion,
+                { updateSelection: true }
               )
               .run();
           }}
@@ -34,6 +34,7 @@ const AICompletionCommands = (props: AICompletionCommandsProps) => {
           <Check class="h-4 w-4 text-muted-foreground" />
           Replace selection
         </CommandItem>
+
         <CommandItem
           class="gap-2 px-4"
           value="insert"
@@ -42,18 +43,20 @@ const AICompletionCommands = (props: AICompletionCommandsProps) => {
             editor()!
               .chain()
               .focus()
-              .insertContentAt(selection.to + 1, props.completion)
+              .insertContentAt(selection.to + 1, props.completion, { updateSelection: true })
               .run();
+            addAIHighlight(editor()!);
           }}
         >
           <TextQuote class="h-4 w-4 text-muted-foreground" />
           Insert below
         </CommandItem>
       </CommandGroup>
+
       <CommandSeparator />
 
       <CommandGroup>
-        <CommandItem onSelect={props.onDiscard} value="thrash" class="gap-2 px-4">
+        <CommandItem onSelect={props.onDiscard} value="trash" class="gap-2 px-4">
           <TrashIcon class="h-4 w-4 text-muted-foreground" />
           Discard
         </CommandItem>

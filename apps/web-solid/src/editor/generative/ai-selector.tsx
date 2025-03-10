@@ -1,4 +1,4 @@
-import { Command, CommandInput } from "../ui/command";
+import { Command, CommandInput, CommandList } from "../ui/command";
 
 import { ArrowUp } from "lucide-solid";
 import { useEditor } from "novel";
@@ -10,7 +10,7 @@ import CrazySpinner from "../ui/icons/crazy-spinner";
 import Magic from "../ui/icons/magic";
 import AICompletionCommands from "./ai-completion-command";
 import AISelectorCommands from "./ai-selector-commands";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 import { useCompletion } from "./use-completion";
 //TODO: I think it makes more sense to create a custom Tiptap extension for this functionality https://tiptap.dev/docs/editor/ai/introduction
 
@@ -36,21 +36,22 @@ export function AISelector(props: AISelectorProps) {
     },
   });
 
-  const hasCompletion = llm.completion.length > 0;
+  const hasCompletion = () => llm.completion.length > 0;
 
   return (
     <Command class="w-[350px]">
-      {hasCompletion && (
+
+      <Show when={hasCompletion()}>
         <div class="flex max-h-[400px]">
           <div class="overflow-auto">
             <div class="prose p-2 px-4 prose-sm">
-              {/* <SolidMarkdown>{llm.completion}</SolidMarkdown> */}
+              <SolidMarkdown>{llm.completion}</SolidMarkdown>
             </div>
           </div>
         </div>
-      )}
+      </Show>
 
-      {llm.isLoading && (
+      <Show when={llm.isLoading}>
         <div class="flex h-12 w-full items-center px-4 text-sm font-medium text-muted-foreground text-purple-500">
           <Magic class="mr-2 h-4 w-4 shrink-0  " />
           AI is thinking
@@ -58,51 +59,62 @@ export function AISelector(props: AISelectorProps) {
             <CrazySpinner />
           </div>
         </div>
-      )}
-      {!llm.isLoading && (
-        <>
-          <div class="relative">
-            <CommandInput
-              value={inputValue()}
-              onValueChange={setInputValue}
-              autofocus
-              placeholder={hasCompletion ? "Tell AI what to do next" : "Ask AI to edit or generate..."}
-              onFocus={() => addAIHighlight(editor()!)}
-            />
-            <Button
-              size="icon"
-              class="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-purple-500 hover:bg-purple-900"
-              onClick={() => {
-                if (llm.completion) {
-                  return llm.complete(llm.completion, {
-                    body: { option: "zap", command: inputValue },
-                  }).then(() => setInputValue(""));
-                }
+      </Show>
 
-                const slice = editor()!.state.selection.content();
-                const text = editor()!.storage.markdown.serializer.serialize(slice.content);
-
-                llm.complete(text, {
+      <Show when={!llm.isLoading}>
+        <div class="relative">
+          <CommandInput
+            ref={e => createEffect(() => e.focus())}
+            value={inputValue()}
+            onValueChange={setInputValue}
+            autofocus
+            placeholder={hasCompletion() ? "Tell AI what to do next" : "Ask AI to edit or generate..."}
+            onFocus={() => addAIHighlight(editor()!)}
+            onKeyDown={e => {
+              if (e.key === 'Escape') {
+                props.onOpenChange(false);
+              }
+            }}
+          />
+          <Button
+            size="icon"
+            class="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-purple-500 hover:bg-purple-900"
+            onClick={() => {
+              if (llm.completion) {
+                return llm.complete(llm.completion, {
                   body: { option: "zap", command: inputValue },
                 }).then(() => setInputValue(""));
-              }}
-            >
-              <ArrowUp class="h-4 w-4" />
-            </Button>
-          </div>
-          {hasCompletion ? (
+              }
+
+              const slice = editor()!.state.selection.content();
+              const text = editor()!.storage.markdown.serializer.serialize(slice.content);
+
+              llm.complete(text, {
+                body: { option: "zap", command: inputValue },
+              }).then(() => setInputValue(""));
+            }}
+          >
+            <ArrowUp class="h-4 w-4" />
+          </Button>
+        </div>
+
+        <CommandList>
+          <Show when={hasCompletion()} fallback={
+            <AISelectorCommands onSelect={(value, option) => llm.complete(value, { body: { option } })} />
+          }>
             <AICompletionCommands
               onDiscard={() => {
                 editor()!.chain().unsetHighlight().focus().run();
+                console.log('discard')
                 props.onOpenChange(false);
               }}
               completion={llm.completion}
             />
-          ) : (
-            <AISelectorCommands onSelect={(value, option) => llm.complete(value, { body: { option } })} />
-          )}
-        </>
-      )}
+          </Show>
+        </CommandList>
+
+      </Show>
+
     </Command>
   );
 }

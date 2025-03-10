@@ -1,7 +1,7 @@
 import { isNodeSelection } from "@tiptap/core";
 import { useCurrentEditor } from "@tiptap/solid";
 import { BubbleMenu, type BubbleMenuProps } from "@tiptap/solid";
-import { type JSX, type Ref, Show, createEffect, createMemo, createSignal, splitProps } from "solid-js";
+import { type JSX, type Ref, Show, createEffect, createMemo, createSignal, on, splitProps } from "solid-js";
 import type { Instance, Props } from "tippy.js";
 
 export interface EditorBubbleProps extends Omit<BubbleMenuProps, "editor" | "ref"> {
@@ -23,24 +23,22 @@ export const EditorBubble = (props: EditorBubbleProps) => {
     }
   });
 
-  const bubbleMenuProps = createMemo((): Omit<BubbleMenuProps, "children"> => {
-    const shouldShow: BubbleMenuProps["shouldShow"] = ({ editor, state }) => {
-      const { selection } = state;
-      const { empty } = selection;
-
-      // don't show bubble menu if:
-      // - the editor is not editable
-      // - the selected node is an image
-      // - the selection is empty
-      // - the selection is a node selection (for drag handles)
-      if (!editor.isEditable || editor.isActive("image") || empty || isNodeSelection(selection)) {
-        return false;
-      }
-      return true;
-    };
-
+  const bubbleMenuProps = createMemo(on(currentEditor, (editor): Omit<BubbleMenuProps, "children"> => {
     return {
-      shouldShow,
+      shouldShow({ editor, state }) {
+        const { selection } = state;
+        const { empty } = selection;
+
+        // don't show bubble menu if:
+        // - the editor is not editable
+        // - the selected node is an image
+        // - the selection is empty
+        // - the selection is a node selection (for drag handles)
+        if (!editor.isEditable || editor.isActive("image") || empty || isNodeSelection(selection)) {
+          return false;
+        }
+        return true;
+      },
       tippyOptions: {
         onCreate: (instance: Instance<Props>) => {
           setInstance(instance);
@@ -53,10 +51,10 @@ export const EditorBubble = (props: EditorBubbleProps) => {
         moveTransition: "transform 0.15s ease-out",
         ...props.tippyOptions,
       },
-      editor: currentEditor(),
+      editor: editor,
       ...rest,
     };
-  });
+  }));
 
   return (
     // We need to add this because of https://github.com/ueberdosis/tiptap/issues/2658
