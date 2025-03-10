@@ -4,6 +4,7 @@ import { cn } from "../../lib/utils";
 import { Check, Trash } from "lucide-solid";
 import { useEditor } from "novel";
 import { createEffect, createSignal, Show } from "solid-js";
+import { createParameterSignal } from "../utils";
 
 export function isValidUrl(url: string) {
   try {
@@ -24,12 +25,15 @@ export function getUrlFromString(str: string) {
     return null;
   }
 }
+
 interface LinkSelectorProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const LinkSelector = (props: LinkSelectorProps) => {
+  const [open, setOpen] = createParameterSignal(() => !!props.open, open => props.onOpenChange?.(open));
+
   const [inputRef, setInputRef] = createSignal<HTMLInputElement>();
   const editor = useEditor();
 
@@ -40,7 +44,7 @@ export const LinkSelector = (props: LinkSelectorProps) => {
 
   return (
     <Show when={editor()}>
-      <Popover modal={true} open={props.open} onOpenChange={props.onOpenChange}>
+      <Popover modal={true} open={open()} onOpenChange={setOpen}>
         <PopoverTrigger as={Button} size="sm" variant="ghost" class="gap-2 rounded-none border-none">
           <p class="text-base">↗</p>
           <p
@@ -60,7 +64,7 @@ export const LinkSelector = (props: LinkSelectorProps) => {
               const url = getUrlFromString(input.value);
               if (url) {
                 editor()!.chain().focus().setLink({ href: url }).run();
-                props.onOpenChange(false);
+                setOpen(false);
               }
             }}
             class="flex  p-1 "
@@ -85,7 +89,7 @@ export const LinkSelector = (props: LinkSelectorProps) => {
                 onClick={() => {
                   editor()!.chain().focus().unsetLink().run();
                   inputRef()!.value = "";
-                  props.onOpenChange(false);
+                  setOpen(false);
                 }}
               >
                 <Trash class="h-4 w-4" />

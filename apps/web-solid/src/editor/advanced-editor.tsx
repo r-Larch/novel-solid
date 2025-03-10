@@ -35,11 +35,6 @@ const TailwindAdvancedEditor = () => {
   const [saveStatus, setSaveStatus] = createSignal("Saved");
   const [charsCount, setCharsCount] = createSignal<number>(0);
 
-  const [openNode, setOpenNode] = createSignal(false);
-  const [openColor, setOpenColor] = createSignal(false);
-  const [openLink, setOpenLink] = createSignal(false);
-  const [openAI, setOpenAI] = createSignal(false);
-
   //Apply Codeblock Highlighting on the HTML from editor.getHTML()
   const highlightCodeblocks = (content: string) => {
     const doc = new DOMParser().parseFromString(content, "text/html");
@@ -84,8 +79,7 @@ const TailwindAdvancedEditor = () => {
               handlePaste: (view, event) => handleImagePaste(view, event, uploadFn),
               handleDrop: (view, event, _slice, moved) => handleImageDrop(view, event, moved, uploadFn),
               attributes: {
-                class:
-                  "prose prose-sm dark:prose-invert prose-headings:font-title font-default focus:outline-hidden max-w-full",
+                class: "prose prose-sm dark:prose-invert prose-headings:font-title font-default focus:outline-hidden max-w-full",
               },
             }}
             onUpdate={({ editor }) => {
@@ -114,18 +108,17 @@ const TailwindAdvancedEditor = () => {
               </EditorCommandList>
             </EditorCommand>
 
-            <GenerativeMenuSwitch open={openAI()} onOpenChange={setOpenAI}>
+            <GenerativeMenuSwitch>
               <Separator orientation="vertical" />
-              <NodeSelector open={openNode()} onOpenChange={setOpenNode} />
+              <NodeSelector />
               <Separator orientation="vertical" />
-
-              <LinkSelector open={openLink()} onOpenChange={setOpenLink} />
+              <LinkSelector />
               <Separator orientation="vertical" />
               <MathSelector />
               <Separator orientation="vertical" />
               <TextButtons />
               <Separator orientation="vertical" />
-              <ColorSelector open={openColor()} onOpenChange={setOpenColor} />
+              <ColorSelector />
             </GenerativeMenuSwitch>
           </EditorContent>
         </EditorRoot>

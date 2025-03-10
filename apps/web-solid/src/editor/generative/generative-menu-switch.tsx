@@ -3,38 +3,40 @@ import { Button } from "../ui/button";
 import Magic from "../ui/icons/magic";
 import { AISelector } from "./ai-selector";
 import { createEffect, JSX, Show } from "solid-js";
+import { createParameterSignal } from "../utils";
 
 interface GenerativeMenuSwitchProps {
   children: JSX.Element;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 const GenerativeMenuSwitch = (props: GenerativeMenuSwitchProps) => {
   const editor = useEditor();
+  const [open, setOpen] = createParameterSignal(() => !!props.open, open => props.onOpenChange?.(open));
 
   createEffect(() => {
-    if (!props.open && editor()) removeAIHighlight(editor()!);
+    if (!open() && editor()) removeAIHighlight(editor()!);
   });
 
   return (
     <EditorBubble
       tippyOptions={{
-        placement: props.open ? "bottom-start" : "top",
+        placement: open() ? "bottom-start" : "top",
         maxWidth: 'none',
         onHidden: () => {
-          props.onOpenChange(false);
+          setOpen(false);
           editor()!.chain().unsetHighlight().run();
         },
       }}
       class="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-muted bg-background shadow-xl"
     >
-      <Show when={props.open}
+      <Show when={open()}
         fallback={
           <>
             <Button
               class="gap-1 rounded-none text-purple-500"
               variant="ghost"
-              onClick={() => props.onOpenChange(true)}
+              onClick={() => setOpen(true)}
               size="sm"
             >
               <Magic class="h-5 w-5" />
@@ -43,7 +45,7 @@ const GenerativeMenuSwitch = (props: GenerativeMenuSwitchProps) => {
             {props.children}
           </>
         }>
-        <AISelector open={props.open} onOpenChange={props.onOpenChange} />
+        <AISelector open={open()} onOpenChange={setOpen} />
       </Show>
     </EditorBubble>
   );

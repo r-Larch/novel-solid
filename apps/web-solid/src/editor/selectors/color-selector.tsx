@@ -4,6 +4,7 @@ import { EditorBubbleItem, useEditor } from "novel";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Show } from "solid-js";
+import { createParameterSignal } from "../utils";
 
 export interface BubbleColorMenuItem {
   name: string;
@@ -89,11 +90,13 @@ const HIGHLIGHT_COLORS: BubbleColorMenuItem[] = [
 ];
 
 interface ColorSelectorProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const ColorSelector = (props: ColorSelectorProps) => {
+  const [open, setOpen] = createParameterSignal(() => !!props.open, open => props.onOpenChange?.(open));
+
   const editor = useEditor();
 
   const activeColorItem = () => TEXT_COLORS.find(({ color }) => editor()!.isActive("textStyle", { color }));
@@ -102,7 +105,7 @@ export const ColorSelector = (props: ColorSelectorProps) => {
 
   return (
     <Show when={editor()}>
-      <Popover modal={true} open={props.open} onOpenChange={props.onOpenChange}>
+      <Popover modal={true} open={open()} onOpenChange={setOpen}>
         <PopoverTrigger as={Button} size="sm" class="gap-2 rounded-none" variant="ghost">
           <span
             class="rounded-sm px-1"
@@ -134,7 +137,7 @@ export const ColorSelector = (props: ColorSelectorProps) => {
                       .focus()
                       .setColor(color || "")
                       .run();
-                  props.onOpenChange(false);
+                  setOpen(false);
                 }}
                 class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent focus:bg-accent focus:outline-1 focus:outline-blue-200"
               >
@@ -155,7 +158,7 @@ export const ColorSelector = (props: ColorSelectorProps) => {
                 onSelect={() => {
                   editor()!.commands.unsetHighlight();
                   name !== "Default" && editor()!.chain().focus().setHighlight({ color }).run();
-                  props.onOpenChange(false);
+                  setOpen(false);
                 }}
                 class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent focus:bg-accent focus:outline-1 focus:outline-blue-200"
               >

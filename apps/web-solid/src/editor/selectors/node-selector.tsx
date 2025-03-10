@@ -16,7 +16,7 @@ import { EditorBubbleItem, EditorInstance, useEditor } from "novel";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { createMemo, For, Show } from "solid-js";
-import { createEditorState } from "../../../../../packages/tiptap-solid/dist";
+import { createParameterSignal } from "../utils";
 
 export type SelectorItem = {
   name: string;
@@ -85,17 +85,19 @@ const items: SelectorItem[] = [
 ];
 
 interface NodeSelectorProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const NodeSelector = (props: NodeSelectorProps) => {
+  const [open, setOpen] = createParameterSignal(() => !!props.open, open => props.onOpenChange?.(open));
+
   const editor = useEditor();
   const activeItem = createMemo(() => items.find((item) => item.isActive(editor()!)) ?? { name: "Multiple" });
 
   return (
     <Show when={editor()}>
-      <Popover modal={true} open={props.open} onOpenChange={props.onOpenChange}>
+      <Popover modal={true} open={open()} onOpenChange={setOpen}>
         <PopoverTrigger as={Button} size="sm" variant="ghost" class="gap-2 rounded-none border-none hover:bg-accent focus:ring-0">
           <span class="whitespace-nowrap text-sm">{activeItem().name}</span>
           <ChevronDown class="h-4 w-4" />
@@ -105,7 +107,7 @@ export const NodeSelector = (props: NodeSelectorProps) => {
             <EditorBubbleItem
               onSelect={(editor) => {
                 item.command(editor);
-                props.onOpenChange(false);
+                setOpen(false);
               }}
               class="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
             >
