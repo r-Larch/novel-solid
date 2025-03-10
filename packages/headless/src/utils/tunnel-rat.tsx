@@ -1,21 +1,27 @@
-import { type Component, type Context, For, type JSX, createContext, createRenderEffect, on, onCleanup, onMount, useContext } from "solid-js";
+import { type Component, type Context, For, type JSX, createContext, createMemo, createRenderEffect, on, onCleanup, onMount, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 type Props = { children: JSX.Element };
 
 type State = {
-  current: Array<JSX.ArrayElement>;
+  current: Slot[];
   version: number;
 };
 
+type Slot = {
+  children: JSX.Element;
+}
+
 export default function tunnel() {
   const [store, setStore] = createStore<State>({
-    current: new Array<JSX.ArrayElement>(),
+    current: [],
     version: 0,
   });
 
   return {
     In: (props: Props): JSX.Element => {
+      const children = createMemo(() => props.children);
+
       /* When this component mounts, we increase the store's version number.
       This will cause all existing rats to re-render (just like if the Out component
       were mapping items to a list.) The re-rendering will cause the final 
@@ -29,24 +35,28 @@ export default function tunnel() {
       /* Any time the children _or_ the store's version number change, insert
       the specified children into the list of rats. */
       createRenderEffect(
-        on([() => props.children, () => store.version], (children) => {
+        on([children, () => store.version], ([children]) => {
+          const slot: Slot = {
+            children,
+          };
+
           setStore((x) => ({
-            current: [...x.current, [children]],
+            current: [...x.current, slot],
           }));
 
           onCleanup(() =>
             setStore((x) => ({
-              current: x.current.filter((c) => c !== children),
+              current: x.current.filter((x) => x !== slot),
             })),
           );
         }),
       );
 
-      return null;
+      return undefined;
     },
 
     Out: () => {
-      return <For each={store.current}>{(x) => <>{x}</>}</For>;
+      return <For each={store.current}>{(x) => <>{x.children}</>}</For>;
     },
   };
 }
@@ -61,5 +71,6 @@ export const EditorCommandTunnelContext = createContext(
 };
 
 EditorCommandTunnelContext.Consumer = (props) => {
-  return props.children(useContext(EditorCommandTunnelContext));
+  const context = useContext(EditorCommandTunnelContext);
+  return props.children(context);
 };

@@ -56,7 +56,7 @@ export function PureEditorContent(props: PureEditorContentProps) {
   });
 
   return (
-    <div ref={mergeRefs(props.ref, editorContainer)} {...rest} />
+    <div ref={mergeRefs(props.ref, e => (editorContainer = e))} {...rest} />
   );
 }
 

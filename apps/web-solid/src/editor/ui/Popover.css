@@ -1,0 +1,35 @@
+.transition-popover[popover],
+.transition-popover[popover]::backdrop {
+    transition:
+        display 0.5s allow-discrete,
+        overlay 0.5s allow-discrete,
+        opacity 0.5s,
+        transform 0.5s;
+
+    /* Exit Stage To */
+    opacity: 0;
+    display: none;
+}
+
+/* On Stage */
+.transition-popover[popover]:popover-open {
+    opacity: 1;
+    display: block;
+
+    &::backdrop {
+        opacity: 0.5;
+    }
+}
+
+/* Enter Stage From */
+@starting-style {
+
+    .transition-popover[popover]:popover-open,
+    .transition-popover[popover]:popover-open::backdrop {
+        opacity: 0;
+    }
+
+    .transition-popover[popover]:popover-open {
+        transform: translateY(10px);
+    }
+}

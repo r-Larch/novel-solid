@@ -4,7 +4,7 @@ import { type Accessor, createSignal, getOwner, onCleanup, onMount } from "solid
 import { isServer } from "solid-js/web";
 import { setTiptapSolidReactiveOwner } from "./ReactiveOwner";
 
-const isDev = process.env.NODE_ENV !== "production";
+const isDev = import.meta.env.DEV;
 
 /**
  * The options for the `createEditor` hook.

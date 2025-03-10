@@ -141,12 +141,6 @@ export const defaultEditorContent = {
                 },
               ],
             },
-            {
-              type: "twitter",
-              attrs: {
-                src: "https://x.com/elonmusk/status/1800759252224729577",
-              },
-            },
           ],
         },
         {

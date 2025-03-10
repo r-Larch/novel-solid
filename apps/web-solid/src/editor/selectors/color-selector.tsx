@@ -125,6 +125,7 @@ export const ColorSelector = (props: ColorSelectorProps) => {
             <div class="my-1 px-2 text-sm font-semibold text-muted-foreground">Color</div>
             {TEXT_COLORS.map(({ name, color }) => (
               <EditorBubbleItem
+                as='button'
                 onSelect={() => {
                   editor()!.commands.unsetColor();
                   name !== "Default" &&
@@ -135,7 +136,7 @@ export const ColorSelector = (props: ColorSelectorProps) => {
                       .run();
                   props.onOpenChange(false);
                 }}
-                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent"
+                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent focus:bg-accent focus:outline-1 focus:outline-blue-200"
               >
                 <div class="flex items-center gap-2">
                   <div class="rounded-sm border px-2 py-px font-medium" style={{ color }}>
@@ -146,16 +147,17 @@ export const ColorSelector = (props: ColorSelectorProps) => {
               </EditorBubbleItem>
             ))}
           </div>
-          <div>
+          <div class="flex flex-col">
             <div class="my-1 px-2 text-sm font-semibold text-muted-foreground">Background</div>
             {HIGHLIGHT_COLORS.map(({ name, color }) => (
               <EditorBubbleItem
+                as="button"
                 onSelect={() => {
                   editor()!.commands.unsetHighlight();
                   name !== "Default" && editor()!.chain().focus().setHighlight({ color }).run();
                   props.onOpenChange(false);
                 }}
-                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent"
+                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent focus:bg-accent focus:outline-1 focus:outline-blue-200"
               >
                 <div class="flex items-center gap-2">
                   <div class="rounded-sm border px-2 py-px font-medium" style={{ "background-color": color }}>

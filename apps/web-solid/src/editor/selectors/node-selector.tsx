@@ -16,6 +16,7 @@ import { EditorBubbleItem, EditorInstance, useEditor } from "novel";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { createMemo, For, Show } from "solid-js";
+import { createEditorState } from "../../../../../packages/tiptap-solid/dist";
 
 export type SelectorItem = {
   name: string;
@@ -90,7 +91,8 @@ interface NodeSelectorProps {
 
 export const NodeSelector = (props: NodeSelectorProps) => {
   const editor = useEditor();
-  const activeItem = createMemo(() => items.filter((item) => item.isActive(editor()!)).pop() ?? { name: "Multiple" });
+  const state = createEditorState(editor)
+  const activeItem = createMemo(() => items.filter((item) => item.isActive(state()!)).pop() ?? { name: "Multiple" });
 
   return (
     <Show when={editor()}>

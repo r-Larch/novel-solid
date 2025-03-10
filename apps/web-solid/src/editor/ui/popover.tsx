@@ -1,8 +1,9 @@
 import { mergeRefs } from "@solid-primitives/refs";
 import { cn } from "../../lib/utils";
-import { batch, Component, createContext, createEffect, createSignal, createUniqueId, JSX, onCleanup, splitProps } from "solid-js";
+import { batch, Component, createContext, createEffect, createSignal, createUniqueId, JSX, onCleanup, Show, splitProps } from "solid-js";
 import { useContext } from "solid-js";
 import { Dynamic } from "solid-js/web";
+import './Popover.css';
 
 
 type PopoverProps = {
@@ -55,27 +56,33 @@ const PopoverContent = (props: PopoverContentProps) => {
   const [store, actions] = usePopoverContext();
   const [_, rest] = splitProps(props, ['class', 'align', 'sideOffset'])
 
+  const offset = () => props.sideOffset ?? 4;
+
   return (
     <BasePopover id={store.dialogId}
       open={store.open}
       onOpenChange={actions.setOpen}
-      source={store.trigger}
+      //source={store.trigger}
       //align={props.align ?? "center"}
       //sideOffset={props.sideOffset ?? 4}
       class={cn(
+        "transition-popover",
         "z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         props.class,
       )}
+      style={{
+        'left': store.rect?.left + 'px',
+        'top': `${store.rect?.top! + store.rect?.height! + offset()}px`,
+        'margin': 0,
+      }}
       {...rest}
     />
   )
 };
 
 export { Popover, PopoverTrigger, PopoverContent };
-
-
 
 type BasePopoverProps = Omit<JSX.IntrinsicElements['dialog'], 'onToggle' | 'popover'> & {
   open?: boolean;
@@ -85,18 +92,18 @@ type BasePopoverProps = Omit<JSX.IntrinsicElements['dialog'], 'onToggle' | 'popo
 }
 
 export function BasePopover(props: BasePopoverProps) {
-  let e!: HTMLDialogElement & { showPopover(o?: { source?: HTMLElement }): void; };
+  let ref!: HTMLDialogElement & { showPopover(o?: { source: HTMLElement }): void; };
 
   createEffect(() => {
-    if (props.open) e.showPopover({ source: props.source })
-    else e.hidePopover()
+    if (props.open) ref.showPopover(props.source ? { source: props.source } : undefined)
+    else ref.hidePopover()
   })
 
-  const [_, rest] = splitProps(props, ['ref', 'mode', 'open', 'onOpenChange'])
+  const [_, rest] = splitProps(props, ['ref', 'open', 'onOpenChange', 'mode', 'source'])
 
   return (
     <dialog
-      ref={mergeRefs(e, props.ref)}
+      ref={mergeRefs(e => (ref = e), props.ref)}
       popover={props.mode ?? 'auto'}
       onToggle={e => props.onOpenChange?.(e.newState === 'open')}
       {...rest}
@@ -109,7 +116,7 @@ export function BasePopover(props: BasePopoverProps) {
 
 function createPopoverContext() {
   const [open, setOpen] = createSignal<boolean>(false);
-  const [rect, setRect] = createSignal<DOMRect>();
+  const [rect, setRect] = createSignal<DOMRect>(new DOMRect(0, 0, 0, 0));
   const [trigger, setTrigger] = createSignal<HTMLElement>();
 
   const store = {

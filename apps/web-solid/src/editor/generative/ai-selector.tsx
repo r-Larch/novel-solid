@@ -44,7 +44,7 @@ export function AISelector(props: AISelectorProps) {
         <div class="flex max-h-[400px]">
           <div class="overflow-auto">
             <div class="prose p-2 px-4 prose-sm">
-              <SolidMarkdown>{llm.completion}</SolidMarkdown>
+              {/* <SolidMarkdown>{llm.completion}</SolidMarkdown> */}
             </div>
           </div>
         </div>

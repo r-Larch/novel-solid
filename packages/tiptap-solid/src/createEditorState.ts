@@ -1,103 +1,15 @@
 import type { Editor } from "@tiptap/core";
-import deepEqual from "fast-deep-equal/es6";
-import { type Accessor, createRenderEffect, onCleanup } from "solid-js";
-import { useSyncExternalStoreWithSelector } from "./utils/useSyncExternalStore";
+import { type Accessor, createComputed, createSignal, on, onCleanup } from "solid-js";
 
-export type EditorStateSnapshot<TEditor extends Editor | null = Editor | null> = {
-  editor: TEditor;
-  transactionNumber: number;
-};
-
-/**
- * To synchronize the editor instance with the component state,
- * we need to create a separate instance that is not affected by the component re-renders.
- */
-class EditorStateManager<TEditor extends Editor | null = Editor | null> {
-  private transactionNumber = 0;
-
-  private lastTransactionNumber = 0;
-
-  private lastSnapshot: EditorStateSnapshot<TEditor>;
-
-  private editor: TEditor;
-
-  private subscribers = new Set<() => void>();
-
-  constructor(initialEditor: TEditor) {
-    this.editor = initialEditor;
-    this.lastSnapshot = { editor: initialEditor, transactionNumber: 0 };
-
-    this.getSnapshot = this.getSnapshot.bind(this);
-    this.getServerSnapshot = this.getServerSnapshot.bind(this);
-    this.watch = this.watch.bind(this);
-    this.subscribe = this.subscribe.bind(this);
-  }
-
-  /**
-   * Get the current editor instance.
-   */
-  getSnapshot(): EditorStateSnapshot<TEditor> {
-    if (this.transactionNumber === this.lastTransactionNumber) {
-      return this.lastSnapshot;
-    }
-    this.lastTransactionNumber = this.transactionNumber;
-    this.lastSnapshot = { editor: this.editor, transactionNumber: this.transactionNumber };
-    return this.lastSnapshot;
-  }
-
-  /**
-   * Always disable the editor on the server-side.
-   */
-  getServerSnapshot(): EditorStateSnapshot<null> {
-    return { editor: null, transactionNumber: 0 };
-  }
-
-  /**
-   * Subscribe to the editor instance's changes.
-   */
-  subscribe(callback: () => void): () => void {
-    this.subscribers.add(callback);
-    return () => {
-      this.subscribers.delete(callback);
-    };
-  }
-
-  /**
-   * Watch the editor instance for changes.
-   */
-  watch(nextEditor: Editor | null): undefined | (() => void) {
-    this.editor = nextEditor as TEditor;
-
-    if (this.editor) {
-      /**
-       * This will force a re-render when the editor state changes.
-       * This is to support things like `editor.can().toggleBold()` in components that `createEditor`.
-       * This could be more efficient, but it's a good trade-off for now.
-       */
-      const fn = () => {
-        this.transactionNumber += 1;
-        this.subscribers.forEach((callback) => callback());
-      };
-
-      const currentEditor = this.editor;
-
-      currentEditor.on("transaction", fn);
-      return () => {
-        currentEditor.off("transaction", fn);
-      };
-    }
-
-    return undefined;
-  }
-}
 
 export type CreateEditorStateOptions<TSelectorResult> = {
   /**
-   * A custom equality function to determine if the editor should re-render.
-   * @default `deepEqual` from `fast-deep-equal`
+   * A custom equality function to determine when to signal a change.
    */
   equals?: (a: TSelectorResult, b: TSelectorResult | null) => boolean;
 };
+
+type EditorSelector<TEditor, T> = ((context: TEditor) => T);
 
 /**
  * This hook allows you to watch for changes on the editor instance.
@@ -108,31 +20,53 @@ export type CreateEditorStateOptions<TSelectorResult> = {
  * @example
  * ```tsx
  * const editor = createEditor({...options})
- * const { currentSelection } = createEditorState(
+ * const currentSelection = createEditorState(
  *  editor,
- *  snapshot => ({ currentSelection: snapshot.editor.state.selection })
+ *  editor => editor.state.selection
  * )
  */
-export function createEditorState<TSelectorResult, TEditor extends Editor | undefined = Editor | undefined>(
+export function createEditorState<
+  TEditor extends Editor | undefined,
+  TSelector extends EditorSelector<TEditor, any> = EditorSelector<TEditor, TEditor>,
+  TSelectorResult = TSelector extends EditorSelector<TEditor, infer T> ? T : never,
+>(
   editor: Accessor<TEditor>,
-  selector: (context: EditorStateSnapshot<Editor | null>) => TSelectorResult,
+  selector?: TSelector,
   options?: CreateEditorStateOptions<TSelectorResult>,
-): Accessor<TSelectorResult | null> {
-  const editorStateManager = new EditorStateManager(editor() ?? null);
+): Accessor<TSelectorResult> {
+  /**
+   * The equals function determines when to signal a change.
+   * false means a change is signaled on every set.
+   * undefined means the default value comparision is used.
+   */
+  const equals = () => {
+    return options?.equals ?? (selector ? undefined : false);
+  }
 
-  // Using the `useSyncExternalStore` hook to sync the editor instance with the component state
-  const selectedState = useSyncExternalStoreWithSelector(
-    editorStateManager.subscribe,
-    editorStateManager.getSnapshot,
-    editorStateManager.getServerSnapshot as any,
-    selector,
-    options?.equals ?? deepEqual,
-  );
+  /**
+   * The value selector function:
+   * If no selector is provided the editor instance is selected.
+   */
+  const selectorFn = selector ?? ((x) => x);
 
-  createRenderEffect(() => {
-    const dispose = editorStateManager.watch(editor() ?? null);
-    onCleanup(() => dispose?.());
-  });
+  const [selection, setSelection] = createSignal<TSelectorResult>(selectorFn(editor()), { equals: equals() })
 
-  return selectedState;
+  createComputed(on(editor, editor => {
+    if (editor) {
+      /**
+       * This will yield a change when the editor state changes.
+       * This is to support things like `editor.can().toggleBold()`.
+       */
+      const fn = () => {
+        console.log('transaction')
+        setSelection(() => selectorFn(editor))
+      };
+
+      fn();
+      editor.on("transaction", fn);
+      onCleanup(() => editor.off("transaction", fn))
+    }
+  }))
+
+  return selection;
 }

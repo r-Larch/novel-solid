@@ -70,19 +70,19 @@ export const AIHighlight = Mark.create<AIHighlightOptions>({
     return {
       setAIHighlight:
         (attributes) =>
-        ({ commands }) => {
-          return commands.setMark(this.name, attributes);
-        },
+          ({ commands }) => {
+            return commands.setMark(this.name, attributes);
+          },
       toggleAIHighlight:
         (attributes) =>
-        ({ commands }) => {
-          return commands.toggleMark(this.name, attributes);
-        },
+          ({ commands }) => {
+            return commands.toggleMark(this.name, attributes);
+          },
       unsetAIHighlight:
         () =>
-        ({ commands }) => {
-          return commands.unsetMark(this.name);
-        },
+          ({ commands }) => {
+            return commands.unsetMark(this.name);
+          },
     };
   },
 
@@ -116,6 +116,7 @@ export const removeAIHighlight = (editor: Editor) => {
   tr.removeMark(0, editor.state.doc.nodeSize - 2, editor.state.schema.marks["ai-highlight"]);
   editor.view.dispatch(tr);
 };
+
 export const addAIHighlight = (editor: Editor, color?: string) => {
   editor
     .chain()

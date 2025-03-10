@@ -1,6 +1,6 @@
 import type { Range } from "@tiptap/core";
 import { Command } from "cmdk-solid";
-import { type Component, type ComponentProps, createComputed, onCleanup, onMount, splitProps } from "solid-js";
+import { type Component, type ComponentProps, createComputed, getOwner, onCleanup, onMount, splitProps } from "solid-js";
 import { useNovelStore } from "../utils/store";
 import { EditorCommandTunnelContext } from "../utils/tunnel-rat";
 
