@@ -121,11 +121,11 @@ export const ColorSelector = (props: ColorSelectorProps) => {
 
         <PopoverContent
           sideOffset={5}
-          class="my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border p-1 shadow-xl "
+          class="my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded p-1 shadow-xl"
           align="start"
         >
           <div class="flex flex-col">
-            <div class="my-1 px-2 text-sm font-semibold text-muted-foreground">Color</div>
+            <div class="my-1 px-2 text-sm font-semibold text-novel-muted-foreground">Color</div>
             {TEXT_COLORS.map(({ name, color }) => (
               <EditorBubbleItem
                 as='button'
@@ -139,19 +139,22 @@ export const ColorSelector = (props: ColorSelectorProps) => {
                       .run();
                   setOpen(false);
                 }}
-                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent focus:bg-accent focus:outline-1 focus:outline-blue-200"
+                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-novel-accent focus:bg-novel-accent focus:outline-1 focus:outline-blue-200"
               >
                 <div class="flex items-center gap-2">
-                  <div class="rounded-sm border px-2 py-px font-medium" style={{ color }}>
+                  <div class="rounded-sm border border-current px-2 py-px font-medium" style={{ color }}>
                     A
                   </div>
                   <span>{name}</span>
                 </div>
+                <Show when={editor()!.isActive("textStyle", { color })}>
+                  <Check class="h-4 w-4" />
+                </Show>
               </EditorBubbleItem>
             ))}
           </div>
           <div class="flex flex-col">
-            <div class="my-1 px-2 text-sm font-semibold text-muted-foreground">Background</div>
+            <div class="my-1 px-2 text-sm font-semibold text-novel-muted-foreground">Background</div>
             {HIGHLIGHT_COLORS.map(({ name, color }) => (
               <EditorBubbleItem
                 as="button"
@@ -160,15 +163,17 @@ export const ColorSelector = (props: ColorSelectorProps) => {
                   name !== "Default" && editor()!.chain().focus().setHighlight({ color }).run();
                   setOpen(false);
                 }}
-                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-accent focus:bg-accent focus:outline-1 focus:outline-blue-200"
+                class="flex cursor-pointer items-center justify-between px-2 py-1 text-sm hover:bg-novel-accent focus:bg-novel-accent focus:outline-1 focus:outline-blue-200"
               >
                 <div class="flex items-center gap-2">
-                  <div class="rounded-sm border px-2 py-px font-medium" style={{ "background-color": color }}>
-                    A
+                  <div class="rounded-sm border border-current bg-current px-2 py-px font-medium" style={{ color }}>
+                    <span class="text-novel-foreground">A</span>
                   </div>
                   <span>{name}</span>
                 </div>
-                {editor()!.isActive("highlight", { color }) && <Check class="h-4 w-4" />}
+                <Show when={editor()!.isActive("highlight", { color })}>
+                  <Check class="h-4 w-4" />
+                </Show>
               </EditorBubbleItem>
             ))}
           </div>

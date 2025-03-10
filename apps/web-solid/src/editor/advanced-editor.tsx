@@ -62,8 +62,8 @@ const TailwindAdvancedEditor = () => {
     <Show when={initialContent()}>
       <div class="relative w-full max-w-(--breakpoint-lg)">
         <div class="flex absolute right-5 top-5 z-10 mb-5 gap-2">
-          <div class="rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground">{saveStatus()}</div>
-          <div class={charsCount() ? "rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground" : "hidden"}>
+          <div class="rounded-lg bg-novel-accent px-2 py-1 text-sm text-novel-muted-foreground">{saveStatus()}</div>
+          <div class={charsCount() ? "rounded-lg bg-novel-accent px-2 py-1 text-sm text-novel-muted-foreground" : "hidden"}>
             {charsCount()} Words
           </div>
         </div>
@@ -71,7 +71,7 @@ const TailwindAdvancedEditor = () => {
           <EditorContent
             initialContent={initialContent()}
             extensions={extensions}
-            class="tiptap relative min-h-[500px] w-full max-w-(--breakpoint-lg) border-muted bg-background sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg"
+            class="tiptap relative min-h-[500px] w-full max-w-(--breakpoint-lg) border-novel-muted bg-novel-background sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg"
             editorProps={{
               handleDOMEvents: {
                 keydown: (_view, event) => handleCommandNavigation(event),
@@ -79,7 +79,7 @@ const TailwindAdvancedEditor = () => {
               handlePaste: (view, event) => handleImagePaste(view, event, uploadFn),
               handleDrop: (view, event, _slice, moved) => handleImageDrop(view, event, moved, uploadFn),
               attributes: {
-                class: "prose prose-sm dark:prose-invert prose-headings:font-title font-default focus:outline-hidden max-w-full",
+                class: "p-12 px-8 sm:px-12 prose prose-sm dark:prose-invert prose-headings:font-title font-default focus:outline-hidden max-w-full",
               },
             }}
             onUpdate={({ editor }) => {
@@ -87,21 +87,21 @@ const TailwindAdvancedEditor = () => {
               setSaveStatus("Unsaved");
             }}
           >
-            <EditorCommand class="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all">
-              <EditorCommandEmpty class="px-2 text-muted-foreground">No results</EditorCommandEmpty>
+            <EditorCommand class="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-novel-muted bg-novel-background px-1 py-2 shadow-md transition-all">
+              <EditorCommandEmpty class="px-2 text-novel-muted-foreground">No results</EditorCommandEmpty>
               <EditorCommandList>
                 <For each={suggestionItems}>{item =>
                   <EditorCommandItem
                     value={item.title}
                     onCommand={(val) => item.command?.(val)}
-                    class="flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm hover:bg-accent aria-selected:bg-accent"
+                    class="flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm hover:bg-novel-accent aria-selected:bg-novel-accent"
                   >
-                    <div class="flex h-10 w-10 items-center justify-center rounded-md border border-muted bg-background">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-md border border-novel-muted bg-novel-background">
                       <Dynamic component={item.icon} />
                     </div>
                     <div>
                       <p class="font-medium">{item.title}</p>
-                      <p class="text-xs text-muted-foreground">{item.description}</p>
+                      <p class="text-xs text-novel-muted-foreground">{item.description}</p>
                     </div>
                   </EditorCommandItem>
                 }</For>

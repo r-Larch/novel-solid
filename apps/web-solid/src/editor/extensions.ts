@@ -32,7 +32,7 @@ const placeholder = Placeholder;
 const tiptapLink = TiptapLink.configure({
   HTMLAttributes: {
     class: cx(
-      "text-muted-foreground underline underline-offset-[3px] hover:text-primary transition-colors cursor-pointer",
+      "text-novel-muted-foreground underline underline-offset-[3px] hover:text-novel-primary transition-colors cursor-pointer",
     ),
   },
 });
@@ -48,13 +48,13 @@ const tiptapImage = TiptapImage.extend({
 }).configure({
   allowBase64: true,
   HTMLAttributes: {
-    class: cx("rounded-lg border border-muted"),
+    class: cx("rounded-lg border border-novel-muted"),
   },
 });
 
 const updatedImage = UpdatedImage.configure({
   HTMLAttributes: {
-    class: cx("rounded-lg border border-muted"),
+    class: cx("rounded-lg border border-novel-muted"),
   },
 });
 
@@ -72,7 +72,7 @@ const taskItem = TaskItem.configure({
 
 const horizontalRule = HorizontalRule.configure({
   HTMLAttributes: {
-    class: cx("mt-4 mb-6 border-t border-muted-foreground"),
+    class: cx("mt-4 mb-6 border-t border-novel-muted-foreground"),
   },
 });
 
@@ -94,17 +94,17 @@ const starterKit = StarterKit.configure({
   },
   blockquote: {
     HTMLAttributes: {
-      class: cx("border-l-4 border-primary"),
+      class: cx("border-l-4 border-novel-primary"),
     },
   },
   codeBlock: {
     HTMLAttributes: {
-      class: cx("rounded-md bg-muted text-muted-foreground border p-5 font-mono font-medium"),
+      class: cx("rounded-md bg-novel-muted text-novel-muted-foreground border p-5 font-mono font-medium"),
     },
   },
   code: {
     HTMLAttributes: {
-      class: cx("rounded-md bg-muted  px-1.5 py-1 font-mono font-medium"),
+      class: cx("rounded-md bg-novel-muted  px-1.5 py-1 font-mono font-medium"),
       spellcheck: "false",
     },
   },
@@ -124,14 +124,14 @@ const codeBlockLowlight = CodeBlockLowlight.configure({
 
 const youtube = Youtube.configure({
   HTMLAttributes: {
-    class: cx("rounded-lg border border-muted"),
+    class: cx("rounded-lg border border-novel-muted"),
   },
   inline: false,
 });
 
 const mathematics = Mathematics.configure({
   HTMLAttributes: {
-    class: cx("text-foreground rounded p-1 hover:bg-accent cursor-pointer"),
+    class: cx("text-novel-foreground rounded p-1 hover:bg-novel-accent cursor-pointer"),
   },
   katexOptions: {
     throwOnError: false,

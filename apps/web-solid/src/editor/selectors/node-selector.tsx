@@ -15,7 +15,7 @@ import { EditorBubbleItem, EditorInstance, useEditor } from "novel";
 
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { createMemo, For, Show } from "solid-js";
+import { createEffect, createMemo, For, Show } from "solid-js";
 import { createParameterSignal } from "../utils";
 
 export type SelectorItem = {
@@ -91,14 +91,14 @@ interface NodeSelectorProps {
 
 export const NodeSelector = (props: NodeSelectorProps) => {
   const [open, setOpen] = createParameterSignal(() => !!props.open, open => props.onOpenChange?.(open));
-
+  createEffect(() => console.log('node', open()))
   const editor = useEditor();
-  const activeItem = createMemo(() => items.find((item) => item.isActive(editor()!)) ?? { name: "Multiple" });
+  const activeItem = createMemo(() => items.findLast((item) => item.isActive(editor()!)) ?? { name: "Multiple" });
 
   return (
     <Show when={editor()}>
       <Popover modal={true} open={open()} onOpenChange={setOpen}>
-        <PopoverTrigger as={Button} size="sm" variant="ghost" class="gap-2 rounded-none border-none hover:bg-accent focus:ring-0">
+        <PopoverTrigger as={Button} size="sm" variant="ghost" class="gap-2 rounded-none border-none hover:bg-novel-accent focus:ring-0">
           <span class="whitespace-nowrap text-sm">{activeItem().name}</span>
           <ChevronDown class="h-4 w-4" />
         </PopoverTrigger>
@@ -109,7 +109,7 @@ export const NodeSelector = (props: NodeSelectorProps) => {
                 item.command(editor);
                 setOpen(false);
               }}
-              class="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
+              class="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-novel-accent"
             >
               <div class="flex items-center space-x-2">
                 <div class="rounded-sm border border-current/20 p-1">

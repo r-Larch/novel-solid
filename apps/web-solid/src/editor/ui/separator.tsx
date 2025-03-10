@@ -25,7 +25,7 @@ const Separator = (props: SeparatorProps) => {
   return (
     <div
       ref={props.ref}
-      class={cn("shrink-0 bg-border", orientation() === "horizontal" ? "h-[1px] w-full" : " w-[1px]", props.class)}
+      class={cn("flex-[0_0_0.5px] bg-novel-border antialiased transform-gpu", orientation() === "horizontal" ? "h-[1px] w-full" : " w-[1px]", props.class)}
       data-orientation={orientation()}
       {...semanticProps}
       {...rest}

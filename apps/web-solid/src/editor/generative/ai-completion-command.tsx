@@ -31,7 +31,7 @@ const AICompletionCommands = (props: AICompletionCommandsProps) => {
               .run();
           }}
         >
-          <Check class="h-4 w-4 text-muted-foreground" />
+          <Check class="h-4 w-4 text-novel-muted-foreground" />
           Replace selection
         </CommandItem>
 
@@ -48,7 +48,7 @@ const AICompletionCommands = (props: AICompletionCommandsProps) => {
             addAIHighlight(editor()!);
           }}
         >
-          <TextQuote class="h-4 w-4 text-muted-foreground" />
+          <TextQuote class="h-4 w-4 text-novel-muted-foreground" />
           Insert below
         </CommandItem>
       </CommandGroup>
@@ -57,7 +57,7 @@ const AICompletionCommands = (props: AICompletionCommandsProps) => {
 
       <CommandGroup>
         <CommandItem onSelect={props.onDiscard} value="trash" class="gap-2 px-4">
-          <TrashIcon class="h-4 w-4 text-muted-foreground" />
+          <TrashIcon class="h-4 w-4 text-novel-muted-foreground" />
           Discard
         </CommandItem>
       </CommandGroup>

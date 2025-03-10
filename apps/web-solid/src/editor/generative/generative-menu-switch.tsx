@@ -28,13 +28,13 @@ const GenerativeMenuSwitch = (props: GenerativeMenuSwitchProps) => {
           editor()!.chain().unsetHighlight().run();
         },
       }}
-      class="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-muted bg-background shadow-xl"
+      class="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-novel-muted bg-novel-background shadow-xl"
     >
       <Show when={open()}
         fallback={
           <>
             <Button
-              class="gap-1 rounded-none text-purple-500"
+              class="gap-1 rounded-none text-white bg-purple-600 hover:bg-purple-700 hover:text-white"
               variant="ghost"
               onClick={() => setOpen(true)}
               size="sm"

@@ -8,19 +8,19 @@ const Command = (props: ComponentProps<typeof CommandPrimitive>) => (
   <CommandPrimitive
     {...props}
     class={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
+      "flex h-full w-full flex-col overflow-hidden rounded-md bg-novel-popover text-novel-popover-foreground",
       props.class,
     )}
   />
 );
 
 const CommandInput = (props: ComponentProps<typeof CommandPrimitive.Input>) => (
-  <div class="flex items-center border-b px-4" cmdk-input-wrapper="">
-    <Magic class="mr-2 h-4 w-4 shrink-0 text-purple-500 " />
+  <div class="flex items-center border-b border-novel-border px-4" cmdk-input-wrapper="">
+    <Magic class="mr-2 h-4 w-4 shrink-0 text-purple-500" />
     <CommandPrimitive.Input
       {...props}
       class={cn(
-        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-novel-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
         props.class,
       )}
     />
@@ -42,21 +42,21 @@ const CommandGroup = (props: ComponentProps<typeof CommandPrimitive.Group>) => (
   <CommandPrimitive.Group
     {...props}
     class={cn(
-      "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+      "overflow-hidden p-1 text-novel-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-novel-muted-foreground",
       props.class,
     )}
   />
 );
 
 const CommandSeparator = (props: ComponentProps<typeof CommandPrimitive.Separator>) => (
-  <CommandPrimitive.Separator {...props} class={cn("-mx-1 h-px bg-border", props.class)} />
+  <CommandPrimitive.Separator {...props} class={cn("-mx-1 h-[0.5px] bg-novel-border antialiased transform-gpu", props.class)} />
 );
 
 const CommandItem = (props: ComponentProps<typeof CommandPrimitive.Item>) => (
   <CommandPrimitive.Item
     {...props}
     class={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden aria-selected:bg-novel-accent aria-selected:text-novel-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50",
       props.class,
     )}
   />
@@ -64,7 +64,7 @@ const CommandItem = (props: ComponentProps<typeof CommandPrimitive.Item>) => (
 
 
 const CommandShortcut = (props: JSX.IntrinsicElements['span']) => {
-  return <span  {...props} class={cn("ml-auto text-xs tracking-widest text-muted-foreground", props.class)} />;
+  return <span  {...props} class={cn("ml-auto text-xs tracking-widest text-novel-muted-foreground", props.class)} />;
 };
 
 

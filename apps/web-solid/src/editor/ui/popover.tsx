@@ -4,6 +4,7 @@ import { batch, Component, createContext, createEffect, createSignal, createUniq
 import { useContext } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import './Popover.css';
+import { createParameterSignal } from "../utils";
 
 
 type PopoverProps = {
@@ -14,7 +15,7 @@ type PopoverProps = {
 }
 
 const Popover = (props: PopoverProps) => {
-  const [store, actions] = createPopoverContext();
+  const [store, actions] = createPopoverContext(props);
   return (
     <PopoverContext.Provider value={[store, actions]}>
       {props.children}
@@ -67,7 +68,7 @@ const PopoverContent = (props: PopoverContentProps) => {
       //sideOffset={props.sideOffset ?? 4}
       class={cn(
         "transition-popover",
-        "z-50 w-72 rounded-md border-none bg-popover p-4 text-popover-foreground shadow-md outline-hidden",
+        "z-50 w-72 rounded-md bg-novel-popover p-4 text-novel-popover-foreground shadow-md outline-hidden",
         props.class,
       )}
       style={{
@@ -111,9 +112,13 @@ export function BasePopover(props: BasePopoverProps) {
   )
 }
 
+type PopoverContextProps = {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
 
-function createPopoverContext() {
-  const [open, setOpen] = createSignal<boolean>(false);
+function createPopoverContext(props: PopoverContextProps) {
+  const [open, setOpen] = createParameterSignal(() => !!props.open, open => props.onOpenChange?.(open));
   const [rect, setRect] = createSignal<DOMRect>(new DOMRect(0, 0, 0, 0));
   const [trigger, setTrigger] = createSignal<HTMLElement>();
 
