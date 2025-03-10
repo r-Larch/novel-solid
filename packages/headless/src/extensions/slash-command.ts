@@ -32,10 +32,9 @@ const Command = Extension.create({
   },
 });
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-function renderItems<I = any, TSelected = any>(
-  element?: Accessor<HTMLElement> | null,
-): ReturnType<NonNullable<SuggestionOptions<I, TSelected>["render"]>> {
+type RenderFunction<I, TSelected> = NonNullable<SuggestionOptions<I, TSelected>["render"]>
+
+const renderItems = <I = any, TSelected = any>(): ReturnType<RenderFunction<I, TSelected>> => {
   let component: SolidRenderer<SuggestionProps<I, TSelected>> | null = null;
   let popup: Instance<Props>[] | null = null;
 
@@ -57,7 +56,7 @@ function renderItems<I = any, TSelected = any>(
 
       popup = tippy("body", {
         getReferenceClientRect: props.clientRect as GetReferenceClientRect,
-        appendTo: () => element?.() ?? document.body,
+        appendTo: () => document.body,
         content: component.element,
         showOnCreate: true,
         interactive: true,
@@ -65,6 +64,7 @@ function renderItems<I = any, TSelected = any>(
         placement: "bottom-start",
       });
     },
+
     onUpdate: (props: SuggestionProps<I, TSelected>) => {
       component?.updateProps(props);
 
@@ -80,8 +80,9 @@ function renderItems<I = any, TSelected = any>(
         return true;
       }
 
-      return component?.element?.dispatchEvent(props.event) ?? true;
+      return false
     },
+
     onExit: () => {
       popup?.[0]?.destroy();
       component?.destroy();

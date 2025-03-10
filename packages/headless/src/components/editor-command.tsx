@@ -57,24 +57,25 @@ export function EditorCommand(props: ComponentProps<typeof Command>) {
   const [_, rest] = splitProps(props, ["children", "class"]);
 
   return (
-    <EditorCommandTunnelContext.Consumer>
-      {(tunnelInstance) => (
-        <tunnelInstance.In>
-          <Command
-            ref={props.ref}
-            onKeyDown={(e) => {
-              e.stopPropagation();
-            }}
-            id="slash-command"
-            class={props.class}
-            {...rest}
-          >
-            <Command.Input value={novel.query} onValueChange={query => setNovel({ query })} style={{ display: "none" }} />
-            {props.children}
-          </Command>
-        </tunnelInstance.In>
-      )}
-    </EditorCommandTunnelContext.Consumer>
+    <EditorCommandTunnelContext.Consumer>{(tunnel) => (
+      <tunnel.In>
+        <Command
+          ref={props.ref}
+          onKeyDown={(e) => {
+            e.stopImmediatePropagation();
+          }}
+          id="slash-command"
+          class={props.class}
+          {...rest}
+        >
+          <Command.Input
+            value={novel.query}
+            onValueChange={query => setNovel({ query })} style={{ display: "none" }}
+          />
+          {props.children}
+        </Command>
+      </tunnel.In>
+    )}</EditorCommandTunnelContext.Consumer>
   );
 };
 

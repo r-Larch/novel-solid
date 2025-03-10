@@ -14,7 +14,7 @@ interface EditorCommandItemProps {
   }) => void;
 }
 
-export const EditorCommandItem = (props: EditorCommandItemProps & ComponentProps<typeof CommandItem>) => {
+export const EditorCommandItem = (props: EditorCommandItemProps & Omit<ComponentProps<typeof CommandItem>, 'onSelect'>) => {
   const currentEditor = useCurrentEditor();
   const [novel] = useNovelStore();
 
