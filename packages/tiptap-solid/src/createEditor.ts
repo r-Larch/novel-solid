@@ -1,8 +1,10 @@
 import { Editor, type EditorOptions } from "@tiptap/core";
 
-import { type Accessor, createSignal, getOwner, onCleanup, onMount } from "solid-js";
+import { type Accessor, createEffect, createMemo, createSignal, getOwner, on, onCleanup, onMount, Signal } from "solid-js";
 import { isServer } from "solid-js/web";
 import { setTiptapSolidReactiveOwner } from "./ReactiveOwner";
+import { createEditorState } from "./createEditorState";
+import { $RAW, Store } from "solid-js/store";
 
 const isDev = import.meta.env.DEV;
 
@@ -94,20 +96,77 @@ export function createEditor(options: CreateEditorOptions = {}): Accessor<Editor
     shouldImmediatelyRender(options) ? createEditorInstance(options) : undefined
   );
 
+  // create the editor on mount and handle destoy on unmount
   onMount(() => {
     const editor = instance()
     if (!editor || editor.isDestroyed) {
       setInstance(createEditorInstance(options));
     }
-  });
 
-  onCleanup(() => {
-    const editor = instance()
-    if (editor && !editor.isDestroyed) {
-      editor.destroy();
-      setInstance();
-    }
+    onCleanup(() => {
+      const editor = instance()
+      if (editor && !editor.isDestroyed) {
+        editor.destroy();
+        setInstance();
+      }
+    })
   })
 
-  return instance;
+  // update editor options on options change
+  createEffect(on(
+    // options my be composed with signalas, so ensure all signals are tracked to re-run the effect on options change.
+    () => ({ ...options, extensions: [...options.extensions ?? []] }),
+    options => {
+      const editor = instance()
+      if (editor && !editor.isDestroyed) {
+        editor.setOptions(options)
+      }
+    },
+    { defer: true } // defer this effect to prevent setOptions immediately after editor creation^as options would be the same.
+  ));
+
+  // create a reactive editor to support things like `editor().can().bold()`
+  const reactiveEditor = createReactiveEditor(instance);
+
+  return reactiveEditor;
+}
+
+
+function createReactiveEditor(editor: Accessor<Editor | undefined>) {
+  const state = createEditorState(editor);
+
+  let editorProxy: Store<Editor & { [$RAW]?: Editor }> | undefined;
+  const reactiveEditor = createMemo(on(editor, (editor) => {
+    if (editor) {
+      if (editor === editorProxy?.[$RAW]) {
+        return editorProxy;
+      }
+      else {
+        return editorProxy = new Proxy(editor, createProxyHandler(state as Accessor<Editor>))
+      }
+    }
+    else {
+      return undefined;
+    }
+  }))
+
+  return reactiveEditor;
+}
+
+
+function createProxyHandler(state: Accessor<Editor>): ProxyHandler<Editor> {
+  const reactiveProps: Array<string | Symbol> = ['can', 'isActive', 'isFocused', 'isInitialized', 'isEditable', 'getAttributes', 'isEmpty', '$node', '$nodes', '$pos', '$doc'];
+  return {
+    get(target, property, receiver) {
+      if (property === $RAW) {
+        return target;
+      }
+      else if (reactiveProps.includes(property)) {
+        return (state() as any)[property];
+      }
+      else {
+        return (target as any)[property]
+      }
+    },
+  }
 }

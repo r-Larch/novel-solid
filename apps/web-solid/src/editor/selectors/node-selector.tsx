@@ -91,8 +91,7 @@ interface NodeSelectorProps {
 
 export const NodeSelector = (props: NodeSelectorProps) => {
   const editor = useEditor();
-  const state = createEditorState(editor)
-  const activeItem = createMemo(() => items.filter((item) => item.isActive(state()!)).pop() ?? { name: "Multiple" });
+  const activeItem = createMemo(() => items.find((item) => item.isActive(editor()!)) ?? { name: "Multiple" });
 
   return (
     <Show when={editor()}>

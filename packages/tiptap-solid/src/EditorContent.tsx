@@ -1,7 +1,7 @@
 import type { Editor } from "@tiptap/core";
 
 import { mergeRefs } from "@solid-primitives/refs";
-import { type JSX, type Ref, Show, createEffect, onCleanup, splitProps } from "solid-js";
+import { type JSX, type Ref, Show, createEffect, on, onCleanup, splitProps } from "solid-js";
 
 export interface PureEditorContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -13,9 +13,7 @@ export function PureEditorContent(props: PureEditorContentProps) {
 
   const [_, rest] = splitProps(props, ["ref", "editor"]);
 
-  createEffect(() => {
-    const editor = props.editor;
-
+  createEffect(on(() => props.editor, editor => {
     if (editor && !editor.isDestroyed && editor.options.element) {
 
       const element = editorContainer;
@@ -28,7 +26,7 @@ export function PureEditorContent(props: PureEditorContentProps) {
 
       editor.createNodeViews();
     }
-  });
+  }));
 
   onCleanup(() => {
     const editor = props.editor;
