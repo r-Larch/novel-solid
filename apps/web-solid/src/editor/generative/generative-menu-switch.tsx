@@ -20,6 +20,7 @@ const GenerativeMenuSwitch = (props: GenerativeMenuSwitchProps) => {
     <EditorBubble
       tippyOptions={{
         placement: props.open ? "bottom-start" : "top",
+        maxWidth: 'none',
         onHidden: () => {
           props.onOpenChange(false);
           editor()!.chain().unsetHighlight().run();

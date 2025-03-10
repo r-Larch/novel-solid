@@ -1,6 +1,6 @@
 import { mergeRefs } from "@solid-primitives/refs";
 import { cn } from "../../lib/utils";
-import { batch, Component, createContext, createEffect, createSignal, createUniqueId, JSX, onCleanup, Show, splitProps } from "solid-js";
+import { batch, Component, createContext, createEffect, createSignal, createUniqueId, JSX, onCleanup, splitProps } from "solid-js";
 import { useContext } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import './Popover.css';
@@ -67,9 +67,7 @@ const PopoverContent = (props: PopoverContentProps) => {
       //sideOffset={props.sideOffset ?? 4}
       class={cn(
         "transition-popover",
-        "z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 w-72 rounded-md border-none bg-popover p-4 text-popover-foreground shadow-md outline-hidden",
         props.class,
       )}
       style={{
@@ -138,8 +136,18 @@ function createPopoverContext() {
           setOpen(_ => !_);
         })
       };
+
+      setRect(trigger.getBoundingClientRect());
+      let id = requestAnimationFrame(function loop() {
+        setRect(trigger.getBoundingClientRect());
+        id = requestAnimationFrame(loop);
+      })
+
       trigger.addEventListener('click', handler)
-      onCleanup(() => trigger.removeEventListener('click', handler))
+      onCleanup(() => {
+        trigger.removeEventListener('click', handler);
+        cancelAnimationFrame(id);
+      })
     },
     setOpen,
   }

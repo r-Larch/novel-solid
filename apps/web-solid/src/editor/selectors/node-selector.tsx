@@ -110,7 +110,7 @@ export const NodeSelector = (props: NodeSelectorProps) => {
               class="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
             >
               <div class="flex items-center space-x-2">
-                <div class="rounded-sm border p-1">
+                <div class="rounded-sm border border-current/20 p-1">
                   <item.icon class="h-3 w-3" />
                 </div>
                 <span>{item.name}</span>

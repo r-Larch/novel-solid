@@ -39,7 +39,7 @@ export function AISelector(props: AISelectorProps) {
   const hasCompletion = () => llm.completion.length > 0;
 
   return (
-    <Command class="w-[350px]">
+    <Command class="min-w-[400px] max-w-[600px]">
 
       <Show when={hasCompletion()}>
         <div class="flex max-h-[400px]">
