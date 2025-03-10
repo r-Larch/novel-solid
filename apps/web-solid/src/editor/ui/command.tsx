@@ -20,7 +20,7 @@ const CommandInput = (props: ComponentProps<typeof CommandPrimitive.Input>) => (
     <CommandPrimitive.Input
       {...props}
       class={cn(
-        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
         props.class,
       )}
     />
@@ -56,7 +56,7 @@ const CommandItem = (props: ComponentProps<typeof CommandPrimitive.Item>) => (
   <CommandPrimitive.Item
     {...props}
     class={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50",
       props.class,
     )}
   />

@@ -69,7 +69,7 @@ export const LinkSelector = (props: LinkSelectorProps) => {
               ref={setInputRef}
               type="text"
               placeholder="Paste a link"
-              class="flex-1 bg-background p-1 text-sm outline-none"
+              class="flex-1 bg-background p-1 text-sm outline-hidden"
               value={editor()!.getAttributes("link").href || ""}
             />
             <Show when={editor()!.getAttributes("link").href} fallback={
